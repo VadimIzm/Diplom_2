@@ -5,7 +5,6 @@ import ru.project.Token;
 import org.junit.Test;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
-import static org.hamcrest.Matchers.equalTo;
 import org.junit.After;
 
 public class EditUserDataTest {
@@ -24,28 +23,26 @@ public class EditUserDataTest {
     }
 
     @Test
-    @DisplayName("Изменение данных пользователя c авторизацией")
-    public void editUserTest() {
+    @DisplayName("Изменение email пользователя c авторизацией")
+    public void editUserEmailTest() {
+        newUser = new NewUser(newUser.email, user.password, user.name);
         Response response = userSteps.editUser(newUser, token);
-        response.then()
-                .assertThat()
-                .statusCode(200)
-                .and()
-                .body("success", equalTo(true))
-                .body("user.email", equalTo(newUser.email))
-                .body("user.name", equalTo(newUser.name));
+        userSteps.checkEditUserResponse(response, newUser.email, newUser.name);
+    }
+
+    @Test
+    @DisplayName("Изменение имени пользователя c авторизацией")
+    public void editUserNameTest() {
+        newUser = new NewUser(user.email, user.password, newUser.name);
+        Response response = userSteps.editUser(newUser, token);
+        userSteps.checkEditUserResponse(response, newUser.email, newUser.name);
     }
 
     @Test
     @DisplayName("Ошибка при изменении данных пользователя без авторизации")
     public void editUserWithOutTokenTest() {
         Response response = userSteps.editUserWithOutToken(newUser);
-        response.then()
-                .assertThat()
-                .statusCode(401)
-                .and()
-                .body("success", equalTo(false))
-                .body("message", equalTo("You should be authorised"));
+        userSteps.checkEditUserWithoutAuthResponse(response);
     }
     @After
     public void delete() {

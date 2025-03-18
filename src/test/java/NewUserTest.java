@@ -7,7 +7,6 @@ import io.qameta.allure.junit4.DisplayName;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
 import io.restassured.response.Response;
-import static org.hamcrest.Matchers.equalTo;
 import org.junit.After;
 
 public class NewUserTest {
@@ -37,11 +36,7 @@ public class NewUserTest {
         NewUser newUser = NewUser.createValidUser();
         userSteps.createUser(newUser);
         Response response = userSteps.createUser(newUser);
-        response.then()
-                .assertThat()
-                .statusCode(403)
-                .and()
-                .body("success", equalTo(false));
+        userSteps.checkCreateExistingUserResponse(response);
     }
 
     @Test
@@ -49,11 +44,7 @@ public class NewUserTest {
     public void createUserWithoutNameFail() {
         NewUser newUser = NewUser.createUserWithoutName();
         Response response = userSteps.createUser(newUser);
-        response.then()
-                .assertThat()
-                .statusCode(403)
-                .and()
-                .body("message", equalTo("Email, password and name are required fields"));
+        userSteps.checkCreateUserWithoutRequiredFieldsResponse(response);
     }
 
     @Test
@@ -61,11 +52,7 @@ public class NewUserTest {
     public void createUserWithoutPasswordFail() {
         NewUser newUser = NewUser.createUserWithoutPassword();
         Response response = userSteps.createUser(newUser);
-        response.then()
-                .assertThat()
-                .statusCode(403)
-                .and()
-                .body("message", equalTo("Email, password and name are required fields"));
+        userSteps.checkCreateUserWithoutRequiredFieldsResponse(response);
     }
 
     @Test
@@ -73,11 +60,7 @@ public class NewUserTest {
     public void createUserWithoutEmailFail() {
         NewUser newUser = NewUser.createUserWithoutEmail();
         Response response = userSteps.createUser(newUser);
-        response.then()
-                .assertThat()
-                .statusCode(403)
-                .and()
-                .body("message", equalTo("Email, password and name are required fields"));
+        userSteps.checkCreateUserWithoutRequiredFieldsResponse(response);
     }
 
     @After

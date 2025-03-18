@@ -1,52 +1,49 @@
 import ru.project.UserSteps;
 import ru.project.NewUser;
 import ru.project.Token;
-import ru.project.Orders;
 import org.junit.Before;
 import org.junit.Test;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
-import static org.hamcrest.Matchers.equalTo;
 import org.junit.After;
 
 public class LoginUserTest {
 
     UserSteps userSteps;
     NewUser user, incorrectUser;
-    Orders orders;
     String accessToken;
 
-//    @Before
-//    public void init() {
-//    }
+    @Before
+    public void init() {
+        userSteps = new UserSteps();
+        user = NewUser.createValidUser();
+        userSteps.createUser(user);
+        accessToken = Token.receivingToken(user);
+    }
 
     @Test
     @DisplayName("Логин пользователя")
     public void loginUserTest() {
-        userSteps = new UserSteps();
-        user = NewUser.createValidUser();
-        //orders = new Orders();
-        userSteps.createUser(user);
-        accessToken = Token.receivingToken(user);
         Response response = userSteps.loginUser(user);
-        response.then()
-                .assertThat()
-                .statusCode(200)
-                .and()
-                .body("success", equalTo(true));
+        userSteps.checkLoginResponse(response);
     }
 
     @Test
-    @DisplayName("Ошибка входа с неверным логином и паролем")
-    public void loginUserFailTest() {
-        userSteps = new UserSteps();
-        incorrectUser = NewUser.createAuthDataWithoutRegistration();
+    @DisplayName("Ошибка входа с неверным email")
+    public void loginUserIncorrectEmailTest() {
+        incorrectUser = NewUser.createValidUser();
+        incorrectUser = new NewUser(incorrectUser.email, user.password, user.name);
         Response response = userSteps.loginUser(incorrectUser);
-        response.then()
-                .assertThat()
-                .statusCode(401)
-                .and()
-                .body("success", equalTo(false));
+        userSteps.checkWrongLoginPasswordResponse(response);
+    }
+
+    @Test
+    @DisplayName("Ошибка входа с неверным паролем")
+    public void loginUserIncorrectPasswordTest() {
+        incorrectUser = NewUser.createValidUser();
+        incorrectUser = new NewUser(user.email, incorrectUser.password, user.name);
+        Response response = userSteps.loginUser(incorrectUser);
+        userSteps.checkWrongLoginPasswordResponse(response);
     }
 
     @After

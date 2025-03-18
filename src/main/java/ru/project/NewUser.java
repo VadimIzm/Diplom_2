@@ -22,14 +22,6 @@ public class NewUser extends Endpoints{
         return new NewUser(email, password, name);
     }
 
-    @Step("Формирование набора данных для логина с неверным логином и паролем")
-    public static NewUser createAuthDataWithoutRegistration() {
-        final String email = "emaill" + new Random().nextInt(10000) + "@bk.ru";
-        final String password = "123456" + new Random().nextInt(10000);
-        final String name = "user" + new Random().nextInt(10000);
-        return new NewUser(email, password, name);
-    }
-
     @Step("Формирование данных пользователя без поля email")
     public static NewUser createUserWithoutEmail() {
         final String password = "passwordWithoutEmail";
